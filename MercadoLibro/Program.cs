@@ -1,3 +1,5 @@
+using MercadoLibro.Features.Filters;
+using MercadoLibro.Features.UserFeature;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +10,13 @@ builder.Services.AddDbContext<MercadoLibroContext>(options =>
     var connection = builder.Configuration.GetConnectionString("MercadoLibroDB"); 
     options.UseNpgsql(connection);
 });
+
+//User
+builder.Services.AddScoped<TransactionFilter>(); //Filter
+builder.Services.AddScoped<UserRepository>(); //Repository
+builder.Services.AddScoped<UserService>(); //Service
+
+
 
 // Add services to the container.
 builder.Services.AddControllers();
