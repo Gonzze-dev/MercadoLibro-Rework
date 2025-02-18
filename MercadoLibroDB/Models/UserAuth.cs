@@ -10,20 +10,18 @@ namespace MercadoLibroDB.Models
         [Key]
         public Guid Id { get; set; }
         public required string Password { get; set; }
-        public required bool Admin { get; set; }
-        public required Guid UserID { get; set; }
+        public bool Admin { get; set; } = false;
+        public Guid? UserID { get; set; }
 
         [ForeignKey("UserID")]
-        public virtual required User User { get; set; }
+        public virtual User? User { get; set; }
 
 
         public UserAuth() { }
 
-
         [SetsRequiredMembers]
-        public UserAuth(Guid userId, string password)
+        public UserAuth(string password)
         {
-            UserID = userId;
             Password = password;
             Admin = false;
         }
