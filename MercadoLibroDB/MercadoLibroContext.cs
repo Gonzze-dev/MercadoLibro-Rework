@@ -32,7 +32,16 @@ namespace MercadoLibroDB
                 .Entity<UserAuth>()
                 .Property(uAuth => uAuth.Id)
                 .HasDefaultValueSql("gen_random_uuid()");
-            
+
+            mBuilder
+                .Entity<UserAuth>()
+                .HasOne(uAuth => uAuth.User)
+                .WithMany()
+                .HasForeignKey(uAuth => uAuth.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+
         }
     }
 }
