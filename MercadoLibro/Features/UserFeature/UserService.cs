@@ -21,6 +21,10 @@ namespace MercadoLibro.Features.UserFeature
 
             var newUser = await _userRepository.AddUser(user, userAuth);
 
+            userAuth.UserID = newUser.Id;
+
+            await _userRepository.AddUserAuth(userAuth);
+
             return newUser;
         }
     }

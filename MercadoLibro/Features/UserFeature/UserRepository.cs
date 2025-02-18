@@ -2,7 +2,6 @@
 using MercadoLibroDB;
 using MercadoLibroDB.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace MercadoLibro.Features.UserFeature
 {
@@ -18,12 +17,17 @@ namespace MercadoLibro.Features.UserFeature
             _context.User.Add(user);
             await _context.SaveChangesAsync();
 
-            userAuth.UserID = user.Id;
+            return user;
+        }
+
+        public async Task<UserAuth> AddUserAuth(UserAuth userAuth)
+        {
 
             _context.UserAuth.Add(userAuth);
+
             await _context.SaveChangesAsync();
 
-            return user;
+            return userAuth;
         }
     }
 }
