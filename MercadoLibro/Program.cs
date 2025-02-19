@@ -1,5 +1,6 @@
-using MercadoLibro.Features.Filters;
+using MercadoLibro.Features.Transaction;
 using MercadoLibro.Features.UserFeature;
+using MercadoLibro.Filters;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,12 +12,14 @@ builder.Services.AddDbContext<MercadoLibroContext>(options =>
     options.UseNpgsql(connection);
 });
 
-//User
+//Transaction
+builder.Services.AddScoped<TransactionDB>();
 builder.Services.AddScoped<TransactionFilter>(); //Filter
+builder.Services.AddScoped<TransactionExceptionFilter>(); //Filter
+
+//User
 builder.Services.AddScoped<UserRepository>(); //Repository
 builder.Services.AddScoped<UserService>(); //Service
-
-
 
 // Add services to the container.
 builder.Services.AddControllers();
