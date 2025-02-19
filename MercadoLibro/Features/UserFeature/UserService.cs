@@ -19,11 +19,15 @@ namespace MercadoLibro.Features.UserFeature
             User user = new(name, email);
             UserAuth userAuth = new(password);
 
-            var newUser = await _userRepository.AddUser(user, userAuth);
+            var newUser = await _userRepository.AddAsync(user);
+
+            await _userRepository.SaveChangesAsync();
 
             userAuth.UserID = newUser.Id;
 
-            await _userRepository.AddUserAuth(userAuth);
+            await _userRepository.AddAsync(userAuth);
+
+            await _userRepository.SaveChangesAsync();
 
             return newUser;
         }
