@@ -1,33 +1,32 @@
-﻿using MercadoLibro.Features.Filters;
+﻿using MercadoLibro.Features.Transaction;
 using MercadoLibroDB;
 using MercadoLibroDB.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MercadoLibro.Features.UserFeature
 {
     public class UserRepository(
-        MercadoLibroContext context    
+        TransactionDB transationDB    
     )
     {
-        readonly MercadoLibroContext _context = context;
+        readonly MercadoLibroContext _context = transationDB._context;
 
-        [ServiceFilter(typeof(TransactionFilter))]
-        public async Task<User> AddUser(User user, UserAuth userAuth)
+        public async Task<User>AddAsync(User user)
         {
-            _context.User.Add(user);
-            await _context.SaveChangesAsync();
+            await _context.User.AddAsync(user);
 
             return user;
         }
 
-        public async Task<UserAuth> AddUserAuth(UserAuth userAuth)
+        public async Task<UserAuth> AddAsync(UserAuth userAuth)
         {
-
-            _context.UserAuth.Add(userAuth);
-
-            await _context.SaveChangesAsync();
+            await _context.UserAuth.AddAsync(userAuth);
 
             return userAuth;
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }
