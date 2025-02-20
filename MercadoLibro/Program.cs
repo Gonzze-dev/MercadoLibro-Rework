@@ -1,5 +1,6 @@
 using MercadoLibro.Features.Transaction;
 using MercadoLibro.Features.UserFeature;
+using MercadoLibro.Features.UserFeature.Filters;
 using MercadoLibro.Filters;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ builder.Services.AddScoped<TransactionExceptionFilter>(); //Filter
 //User
 builder.Services.AddScoped<UserRepository>(); //Repository
 builder.Services.AddScoped<UserService>(); //Service
+builder.Services.AddScoped<LoginExceptionFilter>(); //Filter
 
 // Add services to the container.
 builder.Services.AddControllers();
