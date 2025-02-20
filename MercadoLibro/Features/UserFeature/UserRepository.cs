@@ -1,6 +1,7 @@
 ﻿using MercadoLibro.Features.Transaction;
 using MercadoLibroDB;
 using MercadoLibroDB.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MercadoLibro.Features.UserFeature
 {
@@ -9,6 +10,33 @@ namespace MercadoLibro.Features.UserFeature
     )
     {
         readonly MercadoLibroContext _context = transationDB._context;
+
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            var user = await _context.User.FirstOrDefaultAsync(x => x.Email == email);
+
+            return user;
+        }
+
+        public async Task<bool> ExistsWithAuthMethod(string authMethod, Guid userId)
+        {
+            var exists = await _context.UserAuth.AnyAsync(uAuth => 
+                uAuth.UserID == userId 
+                && uAuth.AuthMethod == authMethod
+            );
+            
+            return exists;
+        }
+
+        public async Task<UserAuth?> GetUserAuthByUserIdAndAuthMethod(Guid userId, string authMethod = "local")
+        {
+            var userAuth = await _context.UserAuth.FirstOrDefaultAsync(uAuth => 
+                uAuth.UserID == userId
+                &&  uAuth.AuthMethod == authMethod
+            );
+
+            return userAuth;
+        }
 
         public async Task<User>AddAsync(User user)
         {
@@ -28,5 +56,6 @@ namespace MercadoLibro.Features.UserFeature
         {
             await _context.SaveChangesAsync();
         }
+
     }
 }
