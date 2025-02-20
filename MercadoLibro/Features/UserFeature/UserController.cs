@@ -1,4 +1,5 @@
-﻿using MercadoLibro.Filters;
+﻿using MercadoLibro.Features.UserFeature.Filters;
+using MercadoLibro.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MercadoLibro.Features.UserFeature
@@ -13,7 +14,6 @@ namespace MercadoLibro.Features.UserFeature
     {
         readonly UserService _userService = userService;
 
-        // GET: User
         [HttpPost("SingUp")]
         [TransactionExceptionFilter]
         [ServiceFilter(typeof(TransactionFilter))]
@@ -23,8 +23,20 @@ namespace MercadoLibro.Features.UserFeature
             string password
         )
         {
-            var user = await _userService.AddUser(name, email, password);
+            var user = await _userService.SingUp(name, email, password);
             
+            return Ok(user);
+        }
+
+        [HttpGet("Login")]
+        [LoginExceptionFilter]
+        public async Task<IActionResult> Login(
+            string email,
+            string password
+        )
+        {
+            var user = await _userService.Login(email, password);
+
             return Ok(user);
         }
     }
