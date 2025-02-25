@@ -1,18 +1,16 @@
-﻿using MercadoLibro.Features.UserFeature.Filters;
-using MercadoLibro.Filters;
+﻿using MercadoLibro.Filters;
 using Microsoft.AspNetCore.Mvc;
+using MercadoLibro.Features.AuthFeature.Filters;
 
-namespace MercadoLibro.Features.UserFeature
+namespace MercadoLibro.Features.AuthFeature
 {
-
     [ApiController]
-    [Route("[controller]")]
-    
-    public class UserController(
-        UserService userService
+    [Route("api/[controller]")]
+    public class AuthController(
+        AuthService authService
     ) : Controller
     {
-        readonly UserService _userService = userService;
+        readonly AuthService _authService = authService;
 
         [HttpPost("SingUp")]
         [TransactionExceptionFilter]
@@ -23,9 +21,9 @@ namespace MercadoLibro.Features.UserFeature
             string password
         )
         {
-            var user = await _userService.SingUp(name, email, password);
-            
-            return Ok(user);
+            string token = await _authService.SingUp(name, email, password);
+
+            return Ok(token);
         }
 
         [HttpGet("Login")]
@@ -35,9 +33,9 @@ namespace MercadoLibro.Features.UserFeature
             string password
         )
         {
-            var user = await _userService.Login(email, password);
+            string token = await _authService.Login(email, password);
 
-            return Ok(user);
+            return Ok(token);
         }
     }
 }

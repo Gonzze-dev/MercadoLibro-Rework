@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace MercadoLibro.Features.UserFeature.Filters
+namespace MercadoLibro.Features.AuthFeature.Filters
 {
 
     [AttributeUsage(AttributeTargets.Method)]

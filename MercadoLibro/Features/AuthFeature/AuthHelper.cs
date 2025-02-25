@@ -1,6 +1,6 @@
-﻿namespace MercadoLibro.Features.UserFeature
+﻿namespace MercadoLibro.Features.AuthFeature
 {
-    public static class UserHelper
+    public class AuthHelper
     {
         public static string HashPassword(string password)
         {
@@ -11,5 +11,6 @@
         {
             return BCrypt.Net.BCrypt.Verify(password, hash);
         }
+
     }
 }

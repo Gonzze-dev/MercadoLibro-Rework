@@ -1,13 +1,17 @@
-﻿using MercadoLibroDB.Models;
+﻿using MercadoLibro.Features.UserFeature;
+using MercadoLibro.Utils;
+using MercadoLibroDB.Models;
 
-namespace MercadoLibro.Features.UserFeature
+namespace MercadoLibro.Features.AuthFeature
 {
-    public class UserService(
-        UserRepository userRepository    
+    public class AuthService(
+        UserRepository userRepository,
+        JWToken jwToken
     )
     {
         readonly UserRepository _userRepository = userRepository;
-        public async Task<User> SingUp( //AddUser - Normal register method
+        readonly JWToken _jwToken = jwToken;
+        public async Task<string> SingUp( //AddUser - Normal register method
             string name,
             string email,
             string password
@@ -18,7 +22,7 @@ namespace MercadoLibro.Features.UserFeature
             User? user = await _userRepository.GetUserByEmail(email);
 
             if (user != null)
-            { 
+            {
                 bool exists = await _userRepository.ExistsWithAuthMethod("local", user.Id);
 
                 if (exists)
@@ -31,13 +35,14 @@ namespace MercadoLibro.Features.UserFeature
             if (user == null)
             {
                 user = new(name, email);
-                
-                _ = await _userRepository.AddAsync(user) ?? throw new Exception("Error creating user");
-                
+
+                _ = await _userRepository.AddAsync(user)
+                    ?? throw new Exception("Error creating user");
+
                 await _userRepository.SaveChangesAsync();
             }
 
-            password = UserHelper.HashPassword(password);
+            password = AuthHelper.HashPassword(password);
 
             UserAuth userAuth = new(password)
             {
@@ -48,23 +53,27 @@ namespace MercadoLibro.Features.UserFeature
 
             await _userRepository.SaveChangesAsync();
 
-            return user;
+            string token = _jwToken.GenerateToken(userAuth);
+
+            return token;
         }
 
-        public async Task<User> SingUp( //SingUp - Auth register method
+        public async Task<string> SingUp( //SingUp - Auth register method
             string name,
             string email,
             string providerId,
             string authMethod
         )
         {
+            string token;
             User? user = await _userRepository.GetUserByEmail(email);
 
             if (user == null)
             {
                 user = new(name, email);
 
-                _ = await _userRepository.AddAsync(user) ?? throw new Exception("Error creating user");
+                _ = await _userRepository.AddAsync(user)
+                    ?? throw new Exception("Error creating user");
 
                 await _userRepository.SaveChangesAsync();
             }
@@ -78,37 +87,51 @@ namespace MercadoLibro.Features.UserFeature
 
             await _userRepository.SaveChangesAsync();
 
-            return user;
+            token = _jwToken.GenerateToken(userAuth);
+
+            return token;
         }
 
-        public async Task<User> Login(
-            string email, 
+        public async Task<string> Login(
+            string email,
             string password
         )
         {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-                throw new ArgumentNullException("Email and password must not be empty");
+            string token;
+            if (string.IsNullOrEmpty(email))
+                throw new ArgumentNullException(
+                    nameof(email),
+                    "must not be empty"
+                );
 
-            var user = await _userRepository.GetUserByEmail(email) 
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException(
+                    nameof(password),
+                    "must not be empty"
+                );
+
+            var user = await _userRepository.GetUserByEmail(email)
                         ?? throw new KeyNotFoundException("The user is not registered");
 
-            UserAuth userAuth = await _userRepository.GetUserAuthByUserIdAndAuthMethod(user.Id) 
+            UserAuth userAuth = await _userRepository.GetUserAuthByUserIdAndAuthMethod(user.Id)
                             ?? throw new KeyNotFoundException("User authentication method not found");
 
-            if (userAuth.Password == null) 
+            if (userAuth.Password == null)
                 throw new InvalidOperationException("An unexpected error occurred, user corrupted");
 
-            var isMath = UserHelper.VerifyPassword(password, userAuth.Password);
-            
-            if (!isMath) 
+            var isMath = AuthHelper.VerifyPassword(password, userAuth.Password);
+
+            if (!isMath)
                 throw new UnauthorizedAccessException("Invalid password");
 
-            return user;
+            token = _jwToken.GenerateToken(userAuth);
+
+            return token;
         }
 
-        public async Task<User> Login(
-            string email, 
-            string providerId, 
+        public async Task<string> Login(
+            string email,
+            string providerId,
             string authMethod
         )
         {

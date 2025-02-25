@@ -1,9 +1,14 @@
 using MercadoLibro.Features.Transaction;
 using MercadoLibro.Features.UserFeature;
-using MercadoLibro.Features.UserFeature.Filters;
 using MercadoLibro.Filters;
+using MercadoLibro.Utils;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using MercadoLibro.Features.AuthFeature;
+using MercadoLibro.Features.AuthFeature.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,18 +18,44 @@ builder.Services.AddDbContext<MercadoLibroContext>(options =>
     options.UseNpgsql(connection);
 });
 
+//Token
+builder.Services.AddSingleton<JWToken>(); //Utils
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer(options =>
+    {
+        var key = builder.Configuration["Jwt:Key"] 
+                    ?? throw new Exception("Secret not found");
+
+        byte[] encode = Encoding.UTF8.GetBytes(key);
+
+        SymmetricSecurityKey signingKey = new(encode);
+        TimeSpan expirationToleranceTime = TimeSpan.FromMinutes(5);
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = signingKey,
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ClockSkew = expirationToleranceTime
+        };
+    });
+
 //Transaction
 builder.Services.AddScoped<TransactionDB>();
-builder.Services.AddScoped<TransactionFilter>(); //Filter
-builder.Services.AddScoped<TransactionExceptionFilter>(); //Filter
+builder.Services.AddScoped<TransactionFilter>();
+builder.Services.AddScoped<TransactionExceptionFilter>();
 
 //User
-builder.Services.AddScoped<UserRepository>(); //Repository
-builder.Services.AddScoped<UserService>(); //Service
-builder.Services.AddScoped<LoginExceptionFilter>(); //Filter
+builder.Services.AddScoped<UserRepository>();
+
+//User
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<LoginExceptionFilter>();
 
 // Add services to the container.
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -40,6 +71,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
