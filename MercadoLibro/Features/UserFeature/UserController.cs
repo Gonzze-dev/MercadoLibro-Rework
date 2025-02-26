@@ -16,7 +16,7 @@ namespace MercadoLibro.Features.UserFeature
         [HttpGet("getAll")]
         public async Task<IActionResult> GetAll()
         {
-            var users = await _userRepository.getAll();
+            var users = await _userRepository.GetAll();
 
             return Ok(users);
         }
