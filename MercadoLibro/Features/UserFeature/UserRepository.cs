@@ -38,6 +38,12 @@ namespace MercadoLibro.Features.UserFeature
             return userAuth;
         }
 
+        public async Task<IEnumerable<User>> getAll()
+        {
+            var users = await _context.User.ToListAsync();
+            return users;
+        }
+
         public async Task<User>AddAsync(User user)
         {
             await _context.User.AddAsync(user);
