@@ -1,4 +1,5 @@
-﻿using MercadoLibro.Features.UserFeature;
+﻿using MercadoLibro.Features.AuthFeature.DTOs;
+using MercadoLibro.Features.UserFeature;
 using MercadoLibro.Utils;
 using MercadoLibroDB.Models;
 
@@ -11,12 +12,12 @@ namespace MercadoLibro.Features.AuthFeature
     {
         readonly UserRepository _userRepository = userRepository;
         readonly JWToken _jwToken = jwToken;
-        public async Task<string> SingUp( //AddUser - Normal register method
-            string name,
-            string email,
-            string password
-        )
+        public async Task<string> SingUp(SingUpRequest singUpRequest)
         {
+            string name = singUpRequest.Name;
+            string email = singUpRequest.Email;
+            string password = singUpRequest.Password;
+
             int minPasswordLength = 8;
 
             User? user = await _userRepository.GetUserByEmail(email);
@@ -58,13 +59,13 @@ namespace MercadoLibro.Features.AuthFeature
             return token;
         }
 
-        public async Task<string> SingUp( //SingUp - Auth register method
-            string name,
-            string email,
-            string providerId,
-            string authMethod
-        )
+        public async Task<string> SingUp(SingUpAuthRequest singUpAuthRequest)//SingUp - Auth register method
         {
+            string name = singUpAuthRequest.Name;
+            string email = singUpAuthRequest.Email;
+            string providerId = singUpAuthRequest.ProviderId;
+            string authMethod = singUpAuthRequest.AuthMethod;
+
             string token;
             User? user = await _userRepository.GetUserByEmail(email);
 
@@ -92,21 +93,22 @@ namespace MercadoLibro.Features.AuthFeature
             return token;
         }
 
-        public async Task<string> Login(
-            string email,
-            string password
-        )
+        public async Task<string> Login(LoginRequest loginRequest)
         {
+
+            string email = loginRequest.Email;
+            string password = loginRequest.Password;
+
             string token;
             if (string.IsNullOrEmpty(email))
                 throw new ArgumentNullException(
-                    nameof(email),
+                    nameof(loginRequest.Email),
                     "must not be empty"
                 );
 
             if (string.IsNullOrEmpty(password))
                 throw new ArgumentNullException(
-                    nameof(password),
+                    nameof(loginRequest.Password),
                     "must not be empty"
                 );
 
