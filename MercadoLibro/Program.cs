@@ -5,10 +5,10 @@ using MercadoLibro.Utils;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using MercadoLibro.Features.AuthFeature;
 using MercadoLibro.Features.AuthFeature.Filters;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +40,13 @@ builder.Services.AddAuthentication("Bearer")
             ClockSkew = expirationToleranceTime
         };
     });
+
+builder.Services.AddAuthorization(option => { 
+    option.AddPolicy(
+        "Admin", 
+        policy => policy.RequireClaim(ClaimTypes.Role, "Admin")
+    );
+});
 
 //Transaction
 builder.Services.AddScoped<TransactionDB>();
