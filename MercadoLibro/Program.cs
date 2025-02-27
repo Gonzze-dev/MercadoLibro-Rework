@@ -1,4 +1,3 @@
-using MercadoLibro.Features.Transaction;
 using MercadoLibro.Features.UserFeature;
 using MercadoLibro.Filters;
 using MercadoLibro.Utils;
@@ -56,7 +55,7 @@ builder.Services.AddScoped<TransactionExceptionFilter>();
 //User
 builder.Services.AddScoped<UserRepository>();
 
-//User
+//Auth
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<LoginExceptionFilter>();
 
