@@ -17,7 +17,6 @@ namespace MercadoLibro.Utils
             UserAuth userAuth
         )
         {
-            int hourExpiration = 1;
             SecurityToken token;
             string jwtToken;
 
@@ -37,7 +36,7 @@ namespace MercadoLibro.Utils
             SecurityTokenDescriptor tokenDescriptor = new ()
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddHours(hourExpiration),
+                Expires = TokenGlobalConfig.GetLifeToken(),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha256Signature
