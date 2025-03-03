@@ -9,6 +9,7 @@ namespace MercadoLibroDB
     {
         public DbSet<User> User { get; set; }
         public DbSet<UserAuth> UserAuth { get; set; }
+        public DbSet<RefreshToken> RefreshToken { get; set; }
 
         protected override void OnModelCreating(ModelBuilder mBuilder)
         {
@@ -20,6 +21,10 @@ namespace MercadoLibroDB
             mBuilder
                 .Entity<UserAuth>()
                 .ToTable("UserAuth");
+
+            mBuilder
+                .Entity<RefreshToken>()
+                .ToTable("RefreshToken");
 
             //User
             mBuilder
@@ -40,8 +45,18 @@ namespace MercadoLibroDB
                 .HasForeignKey(uAuth => uAuth.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            //RefreshToken
+            mBuilder
+                .Entity<RefreshToken>()
+                .Property(rToken => rToken.Id)
+                .HasDefaultValueSql("gen_random_uuid()");
 
-
+            mBuilder
+                .Entity<RefreshToken>()
+                .HasOne(rToken => rToken.User)
+                .WithMany()
+                .HasForeignKey(rToken => rToken.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
