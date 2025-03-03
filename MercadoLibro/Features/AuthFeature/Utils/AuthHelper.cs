@@ -1,4 +1,7 @@
-﻿namespace MercadoLibro.Features.AuthFeature
+﻿using MercadoLibro.Utils;
+using MercadoLibroDB.Models;
+
+namespace MercadoLibro.Features.AuthFeature.Helpers
 {
     public class AuthHelper
     {

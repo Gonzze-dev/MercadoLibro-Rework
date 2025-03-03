@@ -1,5 +1,7 @@
-﻿using MercadoLibro.Features.AuthFeature.DTOs.Request;
+﻿using MercadoLibro.DTOs;
+using MercadoLibro.Features.AuthFeature.DTOs.Request;
 using MercadoLibro.Features.AuthFeature.DTOs.Service;
+using MercadoLibro.Features.AuthFeature.Helpers;
 using MercadoLibro.Features.RefreshTokenFeature;
 using MercadoLibro.Features.UserFeature;
 using MercadoLibro.Utils;
@@ -18,11 +20,13 @@ namespace MercadoLibro.Features.AuthFeature
         readonly RefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
         readonly JWToken _jwToken = jwToken;
 
-        public async Task<TokenResponse> SingUp(SingUpRequest singUpRequest)
+        public async Task<GeneralResponse<TokenResponse>> SignUp(SignUpRequest signUpRequest)
         {
-            string name = singUpRequest.Name;
-            string email = singUpRequest.Email;
-            string password = singUpRequest.Password;
+            string name = signUpRequest.Name;
+            string email = signUpRequest.Email;
+            string password = signUpRequest.Password;
+
+            GeneralResponse<TokenResponse> response = new();
 
             string token;
             string refreshToken;
@@ -30,25 +34,29 @@ namespace MercadoLibro.Features.AuthFeature
 
             int minPasswordLength = 8;
 
+            if (password.Length < minPasswordLength)
+            {
+                response.Errors.Add(new ErrorHttp("Password must be at least 8 characters long", 400));
+                return response;
+            }
+
             User? user = await _userRepository.GetUserByEmail(email);
 
             if (user != null)
             {
                 bool exists = await _userRepository.ExistsWithAuthMethod("local", user.Id);
 
-                if (exists)
-                    throw new Exception("User already exists");
+                if (exists){
+                    response.Errors.Add(new ErrorHttp("User already exists", 409));
+                    return response;
+                }
             }
-
-            if (password.Length < minPasswordLength)
-                throw new Exception("Password must be at least 8 characters long");
 
             if (user == null)
             {
                 user = new(name, email);
 
-                _ = await _userRepository.AddAsync(user)
-                    ?? throw new Exception("Error creating user");
+                await _userRepository.AddAsync(user);
 
                 await _userRepository.SaveChangesAsync();
             }
@@ -80,21 +88,23 @@ namespace MercadoLibro.Features.AuthFeature
 
             await _refreshTokenRepository.SaveChangesAsync();
 
-            TokenResponse tokenResponse = new()
+            response.Data = new()
             {
                 Token = token,
                 RefreshToken = refreshToken,
             };
 
-            return tokenResponse;
+            return response;
         }
 
-        public async Task<TokenResponse> SingUp(SingUpAuthRequest singUpAuthRequest)//SingUp - Auth register method
+        public async Task<GeneralResponse<TokenResponse>> SignUp(SignUpAuthRequest signUpAuthRequest)//SingUp - Auth register method
         {
-            string name = singUpAuthRequest.Name;
-            string email = singUpAuthRequest.Email;
-            string providerId = singUpAuthRequest.ProviderId;
-            string authMethod = singUpAuthRequest.AuthMethod;
+            string name = signUpAuthRequest.Name;
+            string email = signUpAuthRequest.Email;
+            string providerId = signUpAuthRequest.ProviderId;
+            string authMethod = signUpAuthRequest.AuthMethod;
+
+            GeneralResponse<TokenResponse> response = new();
 
             string token;
             string refreshToken;
@@ -106,8 +116,7 @@ namespace MercadoLibro.Features.AuthFeature
             {
                 user = new(name, email);
 
-                _ = await _userRepository.AddAsync(user)
-                    ?? throw new Exception("Error creating user");
+                await _userRepository.AddAsync(user);
 
                 await _userRepository.SaveChangesAsync();
             }
@@ -136,91 +145,108 @@ namespace MercadoLibro.Features.AuthFeature
 
             await _refreshTokenRepository.SaveChangesAsync();
 
-            TokenResponse tokenResponse = new()
+            response.Data = new()
             {
                 Token = token,
                 RefreshToken = refreshToken,
             };
 
-            return tokenResponse;
+            return response;
         }
 
-        public async Task<TokenResponse> Login(LoginRequest loginRequest)
+        public async Task<GeneralResponse<TokenResponse>> Login(LoginRequest loginRequest)
         {
             string email = loginRequest.Email;
             string password = loginRequest.Password;
 
+            GeneralResponse<TokenResponse> response = new();
+
+            Guid userId;
             string token;
             RefreshToken refreshToken;
 
             if (string.IsNullOrEmpty(email))
-                throw new ArgumentNullException(
-                    nameof(email),
-                    "must not be empty"
-                );
+                response.Errors.Add(new ErrorHttp($"{nameof(email)} must not be empty", 400));
 
             if (string.IsNullOrEmpty(password))
-                throw new ArgumentNullException(
-                    nameof(password),
-                    "must not be empty"
-                );
+                response.Errors.Add(new ErrorHttp($"{nameof(email)} must not be empty", 400));
 
-            Guid userId;
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+                return response;
 
-            var user = await _userRepository.GetUserByEmail(email)
-                        ?? throw new KeyNotFoundException("The user is not registered");
+            User? user = await _userRepository.GetUserByEmail(email);
+
+            if (user == null)
+            {
+                response.Errors.Add(new ErrorHttp("The user is not registered", 409));
+                return response;
+            }
             
             userId = user.Id;
 
-            UserAuth userAuth = await _userRepository.GetUserAuth(userId)
-                            ?? throw new KeyNotFoundException("User authentication method not found");
-            
+            UserAuth? userAuth = await _userRepository.GetUserAuth(userId);
+
+            if (userAuth == null)
+            {
+                response.Errors.Add(new ErrorHttp("User authentication not found", 401));
+                return response;
+            }
+
             refreshToken = await _refreshTokenRepository.GetOrCreateNewRefreshTokenIfNotExistOrExpired(userId);
 
             if (userAuth.Password == null)
-                throw new InvalidOperationException("An unexpected error occurred, user corrupted");
+            {
+                response.Errors.Add(new ErrorHttp("An unexpected error occurred, user corrupted", 500));
+                return response;
+            }
 
             var isMath = AuthHelper.VerifyPassword(password, userAuth.Password);
 
             if (!isMath)
-                throw new UnauthorizedAccessException("Invalid password");
+            {
+                response.Errors.Add(new ErrorHttp("Invalid password", 401));
+                return response;
+            }
 
             token = _jwToken.GenerateToken(userAuth);
 
-            TokenResponse tokenResponse = new()
+            response.Data = new()
             {
                 Token = token,
                 RefreshToken = refreshToken.Token,
             };
             
-            return tokenResponse;
+            return response;
         }
 
-        public async Task<string> Login(
-            string email,
-            string providerId,
-            string authMethod
-        )
+        public async Task<GeneralResponse<string>> SilentAuthentication(string refresTokebn)
         {
-            throw new NotImplementedException("Login by Auth");
-        }
+            GeneralResponse<string> response = new();
 
-        public async Task<string> SilentAuthentication(string refresTokebn)
-        {
-            string token;
+            RefreshToken? refreshToken = await _refreshTokenRepository.GetRefreshTokenAccess(refresTokebn);
 
-            RefreshToken refreshToken = await _refreshTokenRepository.GetRefreshTokenAccess(refresTokebn)
-                                        ?? throw new Exception("Invalid refresh token");
+            if (refreshToken == null)
+            {
+                response.Errors.Add(new ErrorHttp("Invalid refresh token", 401));
+                return response;
+            }
 
             if (refreshToken.ExpireAt < DateTime.UtcNow)
-                throw new UnauthorizedAccessException("Refresh token expired");
+            {
+                response.Errors.Add(new ErrorHttp("Refresh token expired", 401));
+                return response;
+            }
 
-            UserAuth userAuth = await _userRepository.GetUserAuth(refreshToken.UserID)
-                                ?? throw new KeyNotFoundException("User not found");
+            UserAuth? userAuth = await _userRepository.GetUserAuth(refreshToken.UserID);
 
-            token = _jwToken.GenerateToken(userAuth);
+            if (userAuth == null) {
+                response.Errors.Add(new ErrorHttp("User not found", 404));
+                return response;
+            }
 
-            return token;
+            response.Data = _jwToken.GenerateToken(userAuth);
+
+            return response;
         }
     }
 
