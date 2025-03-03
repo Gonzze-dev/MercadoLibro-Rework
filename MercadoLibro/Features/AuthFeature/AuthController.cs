@@ -1,7 +1,9 @@
 ﻿using MercadoLibro.Filters;
 using Microsoft.AspNetCore.Mvc;
 using MercadoLibro.Features.AuthFeature.Filters;
-using MercadoLibro.Features.AuthFeature.DTOs;
+using MercadoLibro.Features.AuthFeature.DTOs.Request;
+using MercadoLibro.Features.AuthFeature.DTOs.Service;
+using MercadoLibroDB.Models;
 
 namespace MercadoLibro.Features.AuthFeature
 {
@@ -19,16 +21,25 @@ namespace MercadoLibro.Features.AuthFeature
         public async Task<IActionResult> SingUp(SingUpRequest singUpRequest)
         {
             
-            string token = await _authService.SingUp(singUpRequest);
+            TokenResponse response = await _authService.SingUp(singUpRequest);
 
-            return Ok(token);
+            return Ok(response);
         }
 
         [HttpGet("Login")]
         [LoginExceptionFilter]
         public async Task<IActionResult> Login(LoginRequest loginRequest)
         {
-            string token = await _authService.Login(loginRequest);
+            TokenResponse response = await _authService.Login(loginRequest);
+
+            return Ok(response);
+        }
+
+        [HttpGet("SilentAuthentication")]
+        [LoginExceptionFilter]
+        public async Task<IActionResult> SilentAuthentication(string refreshToken)
+        {
+            string token = await _authService.SilentAuthentication(refreshToken);
 
             return Ok(token);
         }
