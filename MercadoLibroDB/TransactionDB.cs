@@ -1,23 +1,22 @@
-﻿using MercadoLibroDB;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore.Storage;
 
-namespace MercadoLibro.Features.Transaction
+namespace MercadoLibroDB
 {
     public class TransactionDB(
         MercadoLibroContext context
     )
     {
-        public readonly MercadoLibroContext _context = context;
+        public readonly MercadoLibroContext Context = context;
         IDbContextTransaction? _transaction;
 
         public async Task BeginTransactionAsync()
         {
-            _transaction = await _context.Database.BeginTransactionAsync();
+            _transaction = await Context.Database.BeginTransactionAsync();
         }
 
         public async Task CommitAsync()
         {
-            if (_transaction != null) 
+            if (_transaction != null)
                 await _transaction.CommitAsync();
         }
 
@@ -29,7 +28,7 @@ namespace MercadoLibro.Features.Transaction
             await _transaction.RollbackAsync();
             await _transaction.DisposeAsync();
             _transaction = null;
-            
+
         }
     }
 }
