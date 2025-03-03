@@ -1,5 +1,4 @@
-﻿using MercadoLibro.Features.Transaction;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Npgsql;
 using System.Data.Common;

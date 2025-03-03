@@ -1,4 +1,4 @@
-﻿using MercadoLibro.Features.Transaction;
+﻿using MercadoLibroDB;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace MercadoLibro.Filters
