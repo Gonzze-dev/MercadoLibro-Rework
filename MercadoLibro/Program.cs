@@ -8,6 +8,8 @@ using System.Text;
 using MercadoLibro.Features.AuthFeature;
 using MercadoLibro.Features.AuthFeature.Filters;
 using System.Security.Claims;
+using MercadoLibroDB.Models;
+using MercadoLibro.Features.RefreshTokenFeature;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +60,9 @@ builder.Services.AddScoped<UserRepository>();
 //Auth
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<LoginExceptionFilter>();
+
+//RefreshToken
+builder.Services.AddScoped<RefreshTokenRepository>();
 
 // Add services to the container.
 builder.Services.AddControllers();
