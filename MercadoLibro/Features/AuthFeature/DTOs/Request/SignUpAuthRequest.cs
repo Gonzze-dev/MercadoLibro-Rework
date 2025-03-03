@@ -1,6 +1,6 @@
 ﻿namespace MercadoLibro.Features.AuthFeature.DTOs.Request
 {
-    public class SingUpAuthRequest
+    public class SignUpAuthRequest
     {
         public required string Name;
         public required string Email;
