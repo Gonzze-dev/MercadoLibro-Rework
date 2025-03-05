@@ -21,7 +21,7 @@ namespace MercadoLibro.Features.AuthFeature
     {
         readonly AuthService _authService = authService;
 
-        [HttpPost("SingUp")]
+        [HttpPost("SignUp")]
         [TransactionExceptionFilter]
         [ServiceFilter(typeof(TransactionFilter))]
         public async Task<IActionResult> SignUp(SignUpRequest signUpRequest)
