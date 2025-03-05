@@ -8,6 +8,8 @@ using MercadoLibro.Features.AuthFeature.Helpers;
 using System.Linq;
 using MercadoLibro.Features.AuthFeature.Utils;
 using MercadoLibro.Features.AuthFeature.DTOs;
+using MercadoLibroDB.Models;
+using System.Web;
 
 namespace MercadoLibro.Features.AuthFeature
 {
@@ -56,7 +58,7 @@ namespace MercadoLibro.Features.AuthFeature
             return Created(silentAuhtUri, new { message = "User created successfully" });
         }
 
-        [HttpGet("Login")]
+        [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginRequest loginRequest)
         {
             GeneralResponse<TokenResponse> response = await _authService.Login(loginRequest);
@@ -89,18 +91,15 @@ namespace MercadoLibro.Features.AuthFeature
             return Ok(new {message = "Login successfully" });
         }
 
-        [HttpGet("SilentAuthentication")]
-        public async Task<IActionResult> SilentAuthentication()
+        [HttpPost("SilentAuthentication")]
+        public async Task<IActionResult> SilentAuthentication(RefreshTokenRequest req)
         {
-            bool existRefreshToken = HttpContext
-                                        .Request
-                                        .Cookies
-                                        .TryGetValue("refresh_token", out string? cookieValue);
-
-            if (!existRefreshToken || cookieValue == null)
+            if (string.IsNullOrEmpty(req.RefreshToken))
                 return StatusCode(400, "refresh token not exist in the cookies");
 
-            GeneralResponse<string> response = await _authService.SilentAuthentication(cookieValue);
+            string refreshToken = HttpUtility.UrlDecode(req.RefreshToken);
+
+            GeneralResponse<string> response = await _authService.SilentAuthentication(refreshToken);
 
             if (response.Errors.Count != 0)
             {
