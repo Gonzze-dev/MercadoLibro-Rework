@@ -14,7 +14,8 @@ namespace MercadoLibro.Utils
         readonly IConfiguration _configuration = configuration;
 
         public string GenerateToken(
-            UserAuth userAuth
+            UserAuth userAuth,
+            User user
         )
         {
             SecurityToken token;
@@ -23,13 +24,14 @@ namespace MercadoLibro.Utils
             string secret = _configuration["Jwt:Key"] 
                 ?? throw new Exception("Secret not found");
 
-            string role = userAuth.Admin ? "Admin" : "User";
+            string role = user.Admin ? "Admin" : "User";
 
             byte[] key = Encoding.ASCII.GetBytes(secret);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, userAuth.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Authentication, userAuth.AuthMethod),
                 new Claim(ClaimTypes.Role, role)
             };
 
