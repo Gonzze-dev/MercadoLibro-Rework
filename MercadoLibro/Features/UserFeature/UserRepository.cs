@@ -17,6 +17,13 @@ namespace MercadoLibro.Features.UserFeature
             return user;
         }
 
+        public async Task<User?> GetUserById(Guid id)
+        {
+            var user = await _context.User.FirstOrDefaultAsync(x => x.Id == id);
+
+            return user;
+        }
+
         public async Task<bool> ExistsWithAuthMethod(string authMethod, Guid userId)
         {
             var exists = await _context.UserAuth.AnyAsync(uAuth => 
@@ -39,8 +46,11 @@ namespace MercadoLibro.Features.UserFeature
 
         public async Task<UserAuth?> GetUserAuth(Guid userId)
         {
+            string LOCAL_AUTH_METHOD = "local";
+
             var userAuth = await _context.UserAuth.FirstOrDefaultAsync(uAuth =>
                 uAuth.UserID == userId
+                && uAuth.AuthMethod == LOCAL_AUTH_METHOD
             );
 
             return userAuth;
