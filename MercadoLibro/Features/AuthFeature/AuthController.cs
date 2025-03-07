@@ -4,29 +4,38 @@ using MercadoLibro.Features.AuthFeature.DTOs.Request;
 using MercadoLibro.Features.AuthFeature.DTOs.Service;
 using MercadoLibro.DTOs;
 using MercadoLibro.Utils;
-using MercadoLibro.Features.AuthFeature.Helpers;
+using MercadoLibro.Features.AuthFeature;
 using System.Linq;
 using MercadoLibro.Features.AuthFeature.Utils;
 using MercadoLibro.Features.AuthFeature.DTOs;
 using MercadoLibroDB.Models;
 using System.Web;
+using Google.Apis.Auth;
+using System.Management;
+using System.Reflection.Metadata.Ecma335;
 
 namespace MercadoLibro.Features.AuthFeature
 {
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController(
-        AuthService authService
+        AuthService authService,
+        IConfiguration configuration,
+        SocialRedHelper socialRedHelper
     ) : Controller
     {
         readonly AuthService _authService = authService;
+        readonly IConfiguration _configuration = configuration;
+        readonly SocialRedHelper _socialRedHelper = socialRedHelper;
 
         [HttpPost("SignUp")]
         [TransactionExceptionFilter]
         [ServiceFilter(typeof(TransactionFilter))]
         public async Task<IActionResult> SignUp(SignUpRequest signUpRequest)
         {
-            string silentAuhtUri = $"{ApiBaseUrl.Url}/Auth/SilentAuthentication";
+            CookieConfig tokenCookie;
+            CookieConfig refreshTokenCookie;
+            string silentAuhtUri = ApiUrl.SILENT_AUTH;
 
             GeneralResponse<TokenResponse> response = await _authService.SignUp(signUpRequest);
 
@@ -40,8 +49,8 @@ namespace MercadoLibro.Features.AuthFeature
             if (response.Data is null)
                 throw new Exception("Response data object is null");
 
-            CookieConfig tokenCookie = CookieHelper.CreateTokenCookie(response.Data.Token);
-            CookieConfig refreshTokenCookie = CookieHelper.CreateRefreshTokenCookie(response.Data.RefreshToken);
+            tokenCookie = CookieHelper.CreateTokenCookie(response.Data.Token);
+            refreshTokenCookie = CookieHelper.CreateRefreshTokenCookie(response.Data.RefreshToken);
 
             Response.Cookies.Append(
                 tokenCookie.Key,
@@ -58,9 +67,57 @@ namespace MercadoLibro.Features.AuthFeature
             return Created(silentAuhtUri, new { message = "User created successfully" });
         }
 
+        [HttpPost("SignUpSocialRed")]
+        public async Task<IActionResult> SignUp(SignUpSocialRequest req)
+        {
+            string idToken = req.IdToken;
+            string authMethod = req.AuthMethod.ToLower();
+            string silentAuhtUri = ApiUrl.SILENT_AUTH;
+
+            SocialRedHelper.SocialAuthMethod socialAuthMethod;
+
+            SocialPayload? payload;
+            GeneralResponse<TokenResponse> response;
+
+            CookieConfig tokenCookie;
+            CookieConfig refreshTokenCookie;
+
+            socialAuthMethod = _socialRedHelper.keyValuePairs[authMethod];
+
+            payload = await socialAuthMethod(_configuration, idToken);
+
+            if (payload is null || _socialRedHelper.Errors.Count > 0)
+                return StatusCode(400, new { errors = _socialRedHelper.Errors });
+
+            response = await _authService.SignUp(payload);
+
+            if(response.Data is null)
+                throw new Exception("Response data object is null");
+
+            tokenCookie = CookieHelper.CreateTokenCookie(response.Data.Token);
+            refreshTokenCookie = CookieHelper.CreateRefreshTokenCookie(response.Data.RefreshToken);
+
+            Response.Cookies.Append(
+                tokenCookie.Key,
+                tokenCookie.Value,
+                tokenCookie.Options
+            );
+
+            Response.Cookies.Append(
+                refreshTokenCookie.Key,
+                refreshTokenCookie.Value,
+                refreshTokenCookie.Options
+            );
+
+            return Created(silentAuhtUri, new { message = $"{authMethod} User created successfully" });
+        }
+
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginRequest loginRequest)
         {
+            CookieConfig tokenCookie;
+            CookieConfig refreshTokenCookie;
+
             GeneralResponse<TokenResponse> response = await _authService.Login(loginRequest);
 
             if (response.Errors.Count != 0)
@@ -73,8 +130,8 @@ namespace MercadoLibro.Features.AuthFeature
             if (response.Data is null)
                 throw new Exception("Response data object is null");
 
-            var tokenCookie = CookieHelper.CreateTokenCookie(response.Data.Token);
-            var refreshTokenCookie = CookieHelper.CreateRefreshTokenCookie(response.Data.RefreshToken);
+            tokenCookie = CookieHelper.CreateTokenCookie(response.Data.Token);
+            refreshTokenCookie = CookieHelper.CreateRefreshTokenCookie(response.Data.RefreshToken);
 
             Response.Cookies.Append(
                 tokenCookie.Key,
@@ -94,6 +151,8 @@ namespace MercadoLibro.Features.AuthFeature
         [HttpPost("SilentAuthentication")]
         public async Task<IActionResult> SilentAuthentication(RefreshTokenRequest req)
         {
+            CookieConfig tokenCookie;
+
             if (string.IsNullOrEmpty(req.RefreshToken))
                 return StatusCode(400, "refresh token not exist in the cookies");
 
@@ -111,7 +170,7 @@ namespace MercadoLibro.Features.AuthFeature
             if (response.Data is null)
                 throw new Exception("response data object is null");
 
-            var tokenCookie = CookieHelper.CreateTokenCookie(response.Data);
+            tokenCookie = CookieHelper.CreateTokenCookie(response.Data);
 
             Response.Cookies.Append(
                 tokenCookie.Key,

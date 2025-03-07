@@ -1,12 +1,12 @@
 ﻿using MercadoLibro.DTOs;
+using MercadoLibro.Features.AuthFeature.DTOs;
 using MercadoLibro.Features.AuthFeature.DTOs.Request;
 using MercadoLibro.Features.AuthFeature.DTOs.Service;
-using MercadoLibro.Features.AuthFeature.Helpers;
+using MercadoLibro.Features.AuthFeature.Utils;
 using MercadoLibro.Features.RefreshTokenFeature;
 using MercadoLibro.Features.UserFeature;
 using MercadoLibro.Utils;
 using MercadoLibroDB.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace MercadoLibro.Features.AuthFeature
 {
@@ -30,15 +30,6 @@ namespace MercadoLibro.Features.AuthFeature
 
             string token;
             string refreshToken;
-            int refreshTokenLifeDays = 7;
-
-            int minPasswordLength = 8;
-
-            if (password.Length < minPasswordLength)
-            {
-                response.Errors.Add(new ErrorHttp("Password must be at least 8 characters long", 400));
-                return response;
-            }
 
             User? user = await _userRepository.GetUserByEmail(email);
 
@@ -63,8 +54,9 @@ namespace MercadoLibro.Features.AuthFeature
 
             password = AuthHelper.HashPassword(password);
 
-            UserAuth userAuth = new(password)
+            UserAuth userAuth = new()
             {
+                Password = password,
                 UserID = user.Id
             };
 
@@ -72,15 +64,14 @@ namespace MercadoLibro.Features.AuthFeature
 
             await _userRepository.SaveChangesAsync();
 
-            token = _jwToken.GenerateToken(userAuth);
+            token = _jwToken.GenerateToken(userAuth, user);
 
             refreshToken = RefreshTokenHelper.GenerateRefreshToken();
 
             RefreshToken refresTokenEntity = new()
             {
                 Token = refreshToken,
-                CreateAt = DateTime.UtcNow,
-                ExpireAt = DateTime.UtcNow.AddDays(refreshTokenLifeDays),
+                ExpireAt = TokenGlobalConfig.GetRefreshTokenLife(),
                 UserID = user.Id
             };
 
@@ -97,22 +88,25 @@ namespace MercadoLibro.Features.AuthFeature
             return response;
         }
 
-        public async Task<GeneralResponse<TokenResponse>> SignUp(SignUpAuthRequest signUpAuthRequest)//SingUp - Auth register method
+        public async Task<GeneralResponse<TokenResponse>> SignUp(SocialPayload socialPayload)//SingUp - Auth register method
         {
-            string name = signUpAuthRequest.Name;
-            string email = signUpAuthRequest.Email;
-            string providerId = signUpAuthRequest.ProviderId;
-            string authMethod = signUpAuthRequest.AuthMethod;
+            string name = socialPayload.Name;
+            string email = socialPayload.Email;
+            string authMethod = socialPayload.AuthMethod;
 
+            UserAuth? userAuth = null;
             GeneralResponse<TokenResponse> response = new();
 
             string token;
             string refreshToken;
-            int refreshTokenLifeDays = 7;
 
             User? user = await _userRepository.GetUserByEmail(email);
 
-            if (user == null)
+            if (user is not null)
+            {
+                userAuth = await _userRepository.GetUserAuth(user.Id, authMethod);
+
+            }else
             {
                 user = new(name, email);
 
@@ -121,26 +115,29 @@ namespace MercadoLibro.Features.AuthFeature
                 await _userRepository.SaveChangesAsync();
             }
 
-            UserAuth userAuth = new(providerId, authMethod)
+            if (userAuth is null)
             {
-                UserID = user.Id
-            };
+                userAuth = new()
+                {
+                    AuthMethod = authMethod,
+                    UserID = user.Id
+                };
 
-            await _userRepository.AddAsync(userAuth);
+                await _userRepository.AddAsync(userAuth);
 
-            await _userRepository.SaveChangesAsync();
+                await _userRepository.SaveChangesAsync();
+            }
 
-            token = _jwToken.GenerateToken(userAuth);
+            token = _jwToken.GenerateToken(userAuth, user);
             refreshToken = RefreshTokenHelper.GenerateRefreshToken();
 
             RefreshToken refreshTokenEntity = new()
             {
                 Token = refreshToken,
-                CreateAt = DateTime.UtcNow,
-                ExpireAt = DateTime.UtcNow.AddDays(refreshTokenLifeDays),
+                ExpireAt = TokenGlobalConfig.GetRefreshTokenLife(),
                 UserID = user.Id,
             };
-            
+
             await _refreshTokenRepository.AddAsync(refreshTokenEntity);
 
             await _refreshTokenRepository.SaveChangesAsync();
@@ -208,7 +205,7 @@ namespace MercadoLibro.Features.AuthFeature
                 return response;
             }
 
-            token = _jwToken.GenerateToken(userAuth);
+            token = _jwToken.GenerateToken(userAuth, user);
 
             response.Data = new()
             {
@@ -222,7 +219,7 @@ namespace MercadoLibro.Features.AuthFeature
         public async Task<GeneralResponse<string>> SilentAuthentication(string refresTokebn)
         {
             GeneralResponse<string> response = new();
-
+            Guid userId;
             RefreshToken? refreshToken = await _refreshTokenRepository.GetRefreshTokenAccess(refresTokebn);
 
             if (refreshToken == null)
@@ -236,15 +233,17 @@ namespace MercadoLibro.Features.AuthFeature
                 response.Errors.Add(new ErrorHttp("Refresh token expired", 401));
                 return response;
             }
+            userId = refreshToken.UserID;
 
-            UserAuth? userAuth = await _userRepository.GetUserAuth(refreshToken.UserID);
+            UserAuth? userAuth = await _userRepository.GetUserAuth(userId);
+            User? user = await _userRepository.GetUserById(userId);
 
-            if (userAuth == null) {
+            if (userAuth == null || user == null) {
                 response.Errors.Add(new ErrorHttp("User not found", 404));
                 return response;
             }
 
-            response.Data = _jwToken.GenerateToken(userAuth);
+            response.Data = _jwToken.GenerateToken(userAuth, user);
 
             return response;
         }

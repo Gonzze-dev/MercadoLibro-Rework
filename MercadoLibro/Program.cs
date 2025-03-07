@@ -9,6 +9,7 @@ using MercadoLibro.Features.AuthFeature;
 using System.Security.Claims;
 using MercadoLibroDB.Models;
 using MercadoLibro.Features.RefreshTokenFeature;
+using MercadoLibro.Features.AuthFeature.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,7 @@ builder.Services.AddScoped<UserRepository>();
 
 //Auth
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<SocialRedHelper>();
 
 //RefreshToken
 builder.Services.AddScoped<RefreshTokenRepository>();
