@@ -9,34 +9,13 @@ namespace MercadoLibroDB.Models
 
         [Key]
         public Guid Id { get; set; }
-        public required string? Password { get; set; }
+        public string? Password { get; set; }
         
-        public required string AuthMethod {get; set;}
-
-        public string? ProviderId { get; set; }
-
-        public bool Admin { get; set; } = false;
+        public string AuthMethod {get; set;} = "local";
 
         public Guid UserID { get; set; }
 
         [ForeignKey("UserID")]
         public virtual User? User { get; set; }
-
-        public UserAuth() { }
-
-        [SetsRequiredMembers]
-        public UserAuth(string password)
-        {
-            Password = password;
-            AuthMethod = "local";
-        }
-
-        [SetsRequiredMembers]
-        public UserAuth(string providerId, string authMethod)
-        {
-            ProviderId = providerId;
-            AuthMethod = authMethod;
-        }
-
     }
 }

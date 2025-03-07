@@ -10,7 +10,7 @@ namespace MercadoLibroDB.Models
 
         public required string Token { get; set; }
 
-        public DateTime CreateAt { get; set; }
+        public DateTime CreateAt { get; set; } = DateTime.UtcNow;
 
         public DateTime ExpireAt { get; set; }
 
