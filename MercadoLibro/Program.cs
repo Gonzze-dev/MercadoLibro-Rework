@@ -1,15 +1,14 @@
 using MercadoLibro.Features.UserFeature;
-using MercadoLibro.Filters;
-using MercadoLibro.Utils;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MercadoLibro.Features.AuthFeature;
 using System.Security.Claims;
-using MercadoLibroDB.Models;
 using MercadoLibro.Features.RefreshTokenFeature;
 using MercadoLibro.Features.AuthFeature.Utils;
+using MercadoLibro.Features.General.Utils;
+using MercadoLibro.Features.General.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,7 +61,9 @@ builder.Services.AddScoped<SocialRedHelper>();
 builder.Services.AddScoped<RefreshTokenRepository>();
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddApplicationPart(typeof(AuthController).Assembly)
+    .AddApplicationPart(typeof(UserController).Assembly);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

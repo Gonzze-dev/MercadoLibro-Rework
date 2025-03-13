@@ -1,7 +1,7 @@
 ﻿using MercadoLibroDB;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace MercadoLibro.Filters
+namespace MercadoLibro.Features.General.Filters
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class TransactionFilter(

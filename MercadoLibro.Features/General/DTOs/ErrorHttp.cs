@@ -1,4 +1,4 @@
-﻿namespace MercadoLibro.DTOs
+﻿namespace MercadoLibro.Features.General.DTOs
 {
     public class ErrorHttp
     {
@@ -8,10 +8,10 @@
         public ErrorHttp(
             string description,
             int statusCode
-        ) 
-        { 
+        )
+        {
             Description = description;
-            StatusCode = statusCode; 
+            StatusCode = statusCode;
         }
     }
 }

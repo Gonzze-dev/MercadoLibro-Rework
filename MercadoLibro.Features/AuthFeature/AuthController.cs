@@ -1,18 +1,13 @@
-﻿using MercadoLibro.Filters;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MercadoLibro.Features.AuthFeature.DTOs.Request;
 using MercadoLibro.Features.AuthFeature.DTOs.Service;
-using MercadoLibro.DTOs;
-using MercadoLibro.Utils;
-using MercadoLibro.Features.AuthFeature;
-using System.Linq;
 using MercadoLibro.Features.AuthFeature.Utils;
 using MercadoLibro.Features.AuthFeature.DTOs;
-using MercadoLibroDB.Models;
 using System.Web;
-using Google.Apis.Auth;
-using System.Management;
-using System.Reflection.Metadata.Ecma335;
+using Microsoft.Extensions.Configuration;
+using MercadoLibro.Features.General.Utils;
+using MercadoLibro.Features.General.Filters;
+using MercadoLibro.Features.General.DTOs;
 
 namespace MercadoLibro.Features.AuthFeature
 {

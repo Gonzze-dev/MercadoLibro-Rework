@@ -1,4 +1,6 @@
-﻿namespace MercadoLibro.Features.AuthFeature.DTOs
+﻿using Microsoft.AspNetCore.Http;
+
+namespace MercadoLibro.Features.AuthFeature.DTOs
 {
     public class CookieConfig()
     {

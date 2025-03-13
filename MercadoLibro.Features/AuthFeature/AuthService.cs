@@ -1,11 +1,11 @@
-﻿using MercadoLibro.DTOs;
-using MercadoLibro.Features.AuthFeature.DTOs;
+﻿using MercadoLibro.Features.AuthFeature.DTOs;
 using MercadoLibro.Features.AuthFeature.DTOs.Request;
 using MercadoLibro.Features.AuthFeature.DTOs.Service;
 using MercadoLibro.Features.AuthFeature.Utils;
+using MercadoLibro.Features.General.DTOs;
+using MercadoLibro.Features.General.Utils;
 using MercadoLibro.Features.RefreshTokenFeature;
 using MercadoLibro.Features.UserFeature;
-using MercadoLibro.Utils;
 using MercadoLibroDB.Models;
 
 namespace MercadoLibro.Features.AuthFeature

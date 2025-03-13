@@ -1,4 +1,4 @@
-﻿namespace MercadoLibro.DTOs
+﻿namespace MercadoLibro.Features.General.DTOs
 {
     public class GeneralResponse<T>
     {
@@ -6,7 +6,7 @@
 
         public List<ErrorHttp> Errors { get; set; }
 
-        public GeneralResponse() 
+        public GeneralResponse()
         {
             Errors = new();
         }

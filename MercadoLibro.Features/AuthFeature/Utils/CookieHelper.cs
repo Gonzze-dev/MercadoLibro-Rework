@@ -1,5 +1,6 @@
 ﻿using MercadoLibro.Features.AuthFeature.DTOs;
-using MercadoLibro.Utils;
+using MercadoLibro.Features.General.Utils;
+using Microsoft.AspNetCore.Http;
 
 namespace MercadoLibro.Features.AuthFeature.Utils
 {
@@ -24,7 +25,6 @@ namespace MercadoLibro.Features.AuthFeature.Utils
 
             return cookie;
         }
-
         public static CookieConfig CreateRefreshTokenCookie(string refreshToken)
         {
             string key = "refresh_token";

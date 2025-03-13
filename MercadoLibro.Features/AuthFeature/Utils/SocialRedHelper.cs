@@ -1,9 +1,10 @@
-﻿using Google.Apis.Auth;
-using MercadoLibro.Features.AuthFeature.Config;
+﻿using MercadoLibro.Features.AuthFeature.Config;
 using MercadoLibro.Features.AuthFeature.DTOs;
+using Google.Apis.Auth;
+using Microsoft.Extensions.Configuration;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using MercadoLibro.Features.General.Utils;
 
 namespace MercadoLibro.Features.AuthFeature.Utils
 {
@@ -79,11 +80,7 @@ namespace MercadoLibro.Features.AuthFeature.Utils
             using HttpClient client = new();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-            };
+            var options = JsonSerealOptions.Options;
 
             var response = await client.GetAsync($"{FacebookConfig.FACEBOOK_AUTH_URL}/me?fields={FacebookConfig.SCOPE}");
 

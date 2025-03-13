@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Npgsql;
 using System.Data.Common;
 
-namespace MercadoLibro.Filters
+namespace MercadoLibro.Features.General.Filters
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class TransactionExceptionFilter : Attribute, IExceptionFilter

@@ -1,4 +1,4 @@
-﻿namespace MercadoLibro.Utils
+﻿namespace MercadoLibro.Features.General.Utils
 {
     public class ApiUrl
     {

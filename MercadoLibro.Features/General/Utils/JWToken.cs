@@ -4,8 +4,9 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Configuration;
 
-namespace MercadoLibro.Utils
+namespace MercadoLibro.Features.General.Utils
 {
     public class JWToken(
         IConfiguration configuration
@@ -21,7 +22,7 @@ namespace MercadoLibro.Utils
             SecurityToken token;
             string jwtToken;
 
-            string secret = _configuration["Jwt:Key"] 
+            string secret = _configuration["Jwt:Key"]
                 ?? throw new Exception("Secret not found");
 
             string role = user.Admin ? "Admin" : "User";
@@ -35,7 +36,7 @@ namespace MercadoLibro.Utils
                 new Claim(ClaimTypes.Role, role)
             };
 
-            SecurityTokenDescriptor tokenDescriptor = new ()
+            SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = TokenGlobalConfig.GetLifeToken(),
