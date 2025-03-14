@@ -13,7 +13,7 @@ namespace MercadoLibroDB.Migrations
 {
     [DbContext(typeof(MercadoLibroContext))]
     [Migration("20250217202533_init")]
-    partial class init
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -6,38 +6,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MercadoLibroDB.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class AddRevokeInRefreshToken : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "RefreshToken",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserAuth",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    Password = table.Column<string>(type: "text", nullable: false),
-                    Admin = table.Column<bool>(type: "boolean", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    CreateAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ExpireAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Revoke = table.Column<bool>(type: "boolean", nullable: false),
                     UserID = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserAuth", x => x.Id);
+                    table.PrimaryKey("PK_RefreshToken", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserAuth_User_UserID",
+                        name: "FK_RefreshToken_User_UserID",
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "Id",
@@ -45,8 +34,8 @@ namespace MercadoLibroDB.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserAuth_UserID",
-                table: "UserAuth",
+                name: "IX_RefreshToken_UserID",
+                table: "RefreshToken",
                 column: "UserID");
         }
 
@@ -54,10 +43,7 @@ namespace MercadoLibroDB.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "UserAuth");
-
-            migrationBuilder.DropTable(
-                name: "User");
+                name: "RefreshToken");
         }
     }
 }

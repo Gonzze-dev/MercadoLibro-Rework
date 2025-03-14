@@ -1,3 +1,4 @@
+using MercadoLibro.Features.UserFeature;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,7 +9,6 @@ using MercadoLibro.Features.RefreshTokenFeature;
 using MercadoLibro.Features.AuthFeature.Utils;
 using MercadoLibro.Features.General.Utils;
 using MercadoLibro.Features.General.Filters;
-using MercadoLibro.Features.UserFeature.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,30 +41,11 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin")
-);
-
-//Transaction
-builder.Services.AddScoped<TransactionDB>();
-builder.Services.AddScoped<TransactionFilter>();
-builder.Services.AddScoped<TransactionExceptionFilter>();
-
-//User
-builder.Services.AddScoped<UserRepository>();
-
-//UserAuth
-builder.Services.AddScoped<UserAuthRepository>();
-
-//Auth
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<SocialRedHelper>();
-
-//RefreshToken
-builder.Services.AddScoped<RefreshTokenRepository>();
-
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddApplicationPart(typeof(AuthController).Assembly)
+    .AddApplicationPart(typeof(UserController).Assembly);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -80,6 +61,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

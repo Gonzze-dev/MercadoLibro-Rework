@@ -1,17 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 
 namespace MercadoLibroDB.Models
 {
-    public class UserAuth
+    public class RefreshToken
     {
-
         [Key]
-        public Guid Id { get; set; }
-        public string? Password { get; set; }
-        
-        public string AuthMethod {get; set;} = "local";
+        public Guid Id;
+
+        public required string Token { get; set; }
+
+        public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+
+        public DateTime ExpireAt { get; set; }
+
+        public bool Revoke { get; set; } = false;
 
         public Guid UserID { get; set; }
 
