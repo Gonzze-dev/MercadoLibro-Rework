@@ -4,8 +4,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MercadoLibro", "MercadoLibro\MercadoLibro.csproj", "{FF877184-EBAC-4BA5-9D53-6A6C0F1D6981}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AC23A1A4-604A-4BFC-AAC6-D6155DB2EB9F} = {AC23A1A4-604A-4BFC-AAC6-D6155DB2EB9F}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MercadoLibroDB", "MercadoLibroDB\MercadoLibroDB.csproj", "{48619FAF-E15B-4D44-ABF1-0B521486C643}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MercadoLibro.Features", "MercadoLibro.Features\MercadoLibro.Features.csproj", "{AC23A1A4-604A-4BFC-AAC6-D6155DB2EB9F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{48619FAF-E15B-4D44-ABF1-0B521486C643} = {48619FAF-E15B-4D44-ABF1-0B521486C643}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +29,10 @@ Global
 		{48619FAF-E15B-4D44-ABF1-0B521486C643}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48619FAF-E15B-4D44-ABF1-0B521486C643}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48619FAF-E15B-4D44-ABF1-0B521486C643}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC23A1A4-604A-4BFC-AAC6-D6155DB2EB9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC23A1A4-604A-4BFC-AAC6-D6155DB2EB9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC23A1A4-604A-4BFC-AAC6-D6155DB2EB9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC23A1A4-604A-4BFC-AAC6-D6155DB2EB9F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

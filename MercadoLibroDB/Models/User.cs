@@ -14,5 +14,6 @@ namespace MercadoLibroDB.Models
         public required string Name { get; set; } = name;
 
         public required string Email { get; set; } = email;
+        public bool Admin { get; set; } = false;
     }
 }
