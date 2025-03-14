@@ -9,6 +9,7 @@ using MercadoLibro.Features.RefreshTokenFeature;
 using MercadoLibro.Features.AuthFeature.Utils;
 using MercadoLibro.Features.General.Utils;
 using MercadoLibro.Features.General.Filters;
+using MercadoLibro.Features.UserFeature.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,28 @@ builder.Services.AddAuthentication("Bearer")
             ClockSkew = expirationToleranceTime
         };
     });
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "Admin")
+);
+
+//Transaction
+builder.Services.AddScoped<TransactionDB>();
+builder.Services.AddScoped<TransactionFilter>();
+builder.Services.AddScoped<TransactionExceptionFilter>();
+
+//User
+builder.Services.AddScoped<UserRepository>();
+
+//UserAuth
+builder.Services.AddScoped<UserAuthRepository>();
+
+//Auth
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<SocialRedHelper>();
+
+//RefreshToken
+builder.Services.AddScoped<RefreshTokenRepository>();
 
 // Add services to the container.
 builder.Services.AddControllers()
