@@ -102,5 +102,9 @@ namespace MercadoLibro.Features.AuthFeature.Utils
 
             return payload;
         }
+
+        public bool HasErrors() =>
+              Errors.Count > 0;
+        
     }
 }

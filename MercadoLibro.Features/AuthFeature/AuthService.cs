@@ -16,19 +16,22 @@ namespace MercadoLibro.Features.AuthFeature
         RefreshTokenRepository refreshTokenRepository,
         JWToken jwToken
     )
+
     {
+        public List<ErrorHttp> Errors { get; set; } = [];
+
         readonly UserRepository _userRepository = userRepository;
         readonly UserAuthRepository _userAuthRepository = userAuthRepository;
         readonly RefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
         readonly JWToken _jwToken = jwToken;
 
-        public async Task<GeneralResponse<TokenResponse>> SignUp(SignUpRequest signUpRequest)
+        public async Task<TokenResponse?> SignUp(SignUpRequest signUpRequest)
         {
             string name = signUpRequest.Name;
             string email = signUpRequest.Email;
             string password = signUpRequest.Password;
 
-            GeneralResponse<TokenResponse> response = new();
+            TokenResponse response;
 
             string token;
             string refreshToken;
@@ -40,8 +43,8 @@ namespace MercadoLibro.Features.AuthFeature
                 bool exists = await _userAuthRepository.Exists("local", user.Id);
 
                 if (exists){
-                    response.Errors.Add(new ErrorHttp("User already exists", 409));
-                    return response;
+                    Errors.Add(new ErrorHttp("User already exists", 409));
+                    return null;
                 }
             }
 
@@ -81,7 +84,7 @@ namespace MercadoLibro.Features.AuthFeature
 
             await _refreshTokenRepository.SaveChangesAsync();
 
-            response.Data = new()
+            response = new()
             {
                 Token = token,
                 RefreshToken = refreshToken,
@@ -90,14 +93,14 @@ namespace MercadoLibro.Features.AuthFeature
             return response;
         }
 
-        public async Task<GeneralResponse<TokenResponse>> SignUp(SocialPayload socialPayload)//SingUp - Auth register method
+        public async Task<TokenResponse> SignUp(SocialPayload socialPayload)//SingUp - Auth register method
         {
             string name = socialPayload.Name;
             string email = socialPayload.Email;
             string authMethod = socialPayload.AuthMethod;
 
             UserAuth? userAuth = null;
-            GeneralResponse<TokenResponse> response = new();
+            TokenResponse response;
 
             string token;
             string refreshToken;
@@ -144,7 +147,7 @@ namespace MercadoLibro.Features.AuthFeature
 
             await _refreshTokenRepository.SaveChangesAsync();
 
-            response.Data = new()
+            response = new()
             {
                 Token = token,
                 RefreshToken = refreshToken,
@@ -153,32 +156,32 @@ namespace MercadoLibro.Features.AuthFeature
             return response;
         }
 
-        public async Task<GeneralResponse<TokenResponse>> Login(LoginRequest loginRequest)
+        public async Task<TokenResponse?> Login(LoginRequest loginRequest)
         {
             string email = loginRequest.Email;
             string password = loginRequest.Password;
 
-            GeneralResponse<TokenResponse> response = new();
+            TokenResponse response;
 
             Guid userId;
             string token;
             RefreshToken refreshToken;
 
             if (string.IsNullOrEmpty(email))
-                response.Errors.Add(new ErrorHttp($"{nameof(email)} must not be empty", 400));
+                Errors.Add(new ErrorHttp($"{nameof(email)} must not be empty", 400));
 
             if (string.IsNullOrEmpty(password))
-                response.Errors.Add(new ErrorHttp($"{nameof(email)} must not be empty", 400));
+                Errors.Add(new ErrorHttp($"{nameof(email)} must not be empty", 400));
 
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
-                return response;
+                return null;
 
             User? user = await _userRepository.Get(email);
 
             if (user == null)
             {
-                response.Errors.Add(new ErrorHttp("The user is not registered", 409));
-                return response;
+                Errors.Add(new ErrorHttp("The user is not registered", 409));
+                return null;
             }
             
             userId = user.Id;
@@ -187,29 +190,29 @@ namespace MercadoLibro.Features.AuthFeature
 
             if (userAuth == null)
             {
-                response.Errors.Add(new ErrorHttp("User authentication not found", 401));
-                return response;
+                Errors.Add(new ErrorHttp("User authentication not found", 401));
+                return null;
             }
 
             refreshToken = await _refreshTokenRepository.GetOrCreateNewRefreshTokenIfNotExistOrExpired(userId);
 
             if (userAuth.Password == null)
             {
-                response.Errors.Add(new ErrorHttp("An unexpected error occurred, user corrupted", 500));
-                return response;
+                Errors.Add(new ErrorHttp("An unexpected error occurred, user corrupted", 500));
+                return null;
             }
 
             var isMath = AuthHelper.VerifyPassword(password, userAuth.Password);
 
             if (!isMath)
             {
-                response.Errors.Add(new ErrorHttp("Invalid password", 401));
-                return response;
+                Errors.Add(new ErrorHttp("Invalid password", 401));
+                return null;
             }
 
             token = _jwToken.GenerateToken(userAuth, user);
 
-            response.Data = new()
+            response= new()
             {
                 Token = token,
                 RefreshToken = refreshToken.Token,
@@ -218,22 +221,23 @@ namespace MercadoLibro.Features.AuthFeature
             return response;
         }
 
-        public async Task<GeneralResponse<string>> SilentAuthentication(string refresTokebn)
+        public async Task<string?> SilentAuthentication(string refresTokebn)
         {
-            GeneralResponse<string> response = new();
+            string response = "";
+
             Guid userId;
             RefreshToken? refreshToken = await _refreshTokenRepository.GetRefreshTokenAccess(refresTokebn);
 
             if (refreshToken == null)
             {
-                response.Errors.Add(new ErrorHttp("Invalid refresh token", 401));
+                Errors.Add(new ErrorHttp("Invalid refresh token", 401));
                 return response;
             }
 
             if (refreshToken.ExpireAt < DateTime.UtcNow)
             {
-                response.Errors.Add(new ErrorHttp("Refresh token expired", 401));
-                return response;
+                Errors.Add(new ErrorHttp("Refresh token expired", 401));
+                return null;
             }
             userId = refreshToken.UserID;
 
@@ -241,14 +245,17 @@ namespace MercadoLibro.Features.AuthFeature
             User? user = await _userRepository.Get(userId);
 
             if (userAuth == null || user == null) {
-                response.Errors.Add(new ErrorHttp("User not found", 404));
-                return response;
+                Errors.Add(new ErrorHttp("User not found", 404));
+                return null;
             }
 
-            response.Data = _jwToken.GenerateToken(userAuth, user);
+            response = _jwToken.GenerateToken(userAuth, user);
 
             return response;
         }
+
+        public bool HasErrors() =>
+            Errors.Count > 0;
     }
 
 }
