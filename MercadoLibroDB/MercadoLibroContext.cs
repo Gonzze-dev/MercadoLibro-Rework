@@ -10,6 +10,8 @@ namespace MercadoLibroDB
         public DbSet<User> User { get; set; }
         public DbSet<UserAuth> UserAuth { get; set; }
         public DbSet<RefreshToken> RefreshToken { get; set; }
+        public DbSet<Cart> Cart { get; set; }
+        public DbSet<CartLine> CartLine { get; set; }
 
         protected override void OnModelCreating(ModelBuilder mBuilder)
         {
@@ -25,6 +27,14 @@ namespace MercadoLibroDB
             mBuilder
                 .Entity<RefreshToken>()
                 .ToTable("RefreshToken");
+
+            mBuilder
+                .Entity<Cart>()
+                .ToTable("Cart");
+
+            mBuilder
+                .Entity<CartLine>()
+                .ToTable("CartLine");
 
             //User
             mBuilder
@@ -56,6 +66,22 @@ namespace MercadoLibroDB
                 .HasOne(rToken => rToken.User)
                 .WithMany()
                 .HasForeignKey(rToken => rToken.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //Cart
+            mBuilder
+                .Entity<Cart>()
+                .HasOne(cart => cart.User)
+                .WithMany()
+                .HasForeignKey(cart => cart.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //CarLine
+            mBuilder
+                .Entity<CartLine>()
+                .HasOne(cLine => cLine.User)
+                .WithMany()
+                .HasForeignKey(cLine => cLine.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
