@@ -10,9 +10,20 @@ namespace MercadoLibroDB
         public DbSet<User> User { get; set; }
         public DbSet<UserAuth> UserAuth { get; set; }
         public DbSet<RefreshToken> RefreshToken { get; set; }
+        public DbSet<Country> Country { get; set; }
+        public DbSet<Province> Province { get; set; }
+        public DbSet<City> City { get; set; }
+        public DbSet<DeliveryAddress> DeliveryAddress { get; set; }
+        public DbSet<Language> Language { get; set; }
+        public DbSet<Publisher> Publisher { get; set; }
+        public DbSet<Author> Author { get; set; }
+        public DbSet<Genre> Genre { get; set; }
+        public DbSet<Book> Book { get; set; }
+        public DbSet<Raiting> Raiting { get; set; }
+        public DbSet<Comment> Comment { get; set; }
+        public DbSet<Coupon> Coupon { get; set; }
         public DbSet<Cart> Cart { get; set; }
         public DbSet<CartLine> CartLine { get; set; }
-
         protected override void OnModelCreating(ModelBuilder mBuilder)
         {
             //Rename tables
@@ -27,6 +38,54 @@ namespace MercadoLibroDB
             mBuilder
                 .Entity<RefreshToken>()
                 .ToTable("RefreshToken");
+
+            mBuilder
+                .Entity<Country>()
+                .ToTable("Country");
+            
+            mBuilder
+                .Entity<Province>()
+                .ToTable("Province");
+
+            mBuilder
+                .Entity<City>()
+                .ToTable("City");
+
+            mBuilder
+                .Entity<DeliveryAddress>()
+                .ToTable("DeliveryAddress");
+
+            mBuilder
+                .Entity<Language>()
+                .ToTable("Language");
+
+            mBuilder
+                .Entity<Publisher>()
+                .ToTable("Publisher");
+
+            mBuilder
+                .Entity<Author>()
+                .ToTable("Author");
+
+            mBuilder
+                .Entity<Genre>()
+                .ToTable("Genre");
+
+            mBuilder
+                .Entity<Book>()
+                .ToTable("Book");
+
+            mBuilder
+                .Entity<Raiting>()
+                .ToTable("Raiting");
+
+            mBuilder
+                .Entity<Comment>()
+                .ToTable("Comment");
+
+            mBuilder
+                .Entity<Coupon>()
+                .ToTable("Coupon");
 
             mBuilder
                 .Entity<Cart>()
