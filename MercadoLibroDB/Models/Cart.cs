@@ -17,6 +17,9 @@ namespace MercadoLibroDB.Models
         [ForeignKey("UserID")]
         public virtual User? User { get; set; }
 
+        [ForeignKey("CouponCode")]
+        public virtual Coupon? Coupon { get; set; }
+
         public virtual ICollection<CartLine>? CartLine { get; set; }
 
     }

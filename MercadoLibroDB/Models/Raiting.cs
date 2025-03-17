@@ -3,16 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MercadoLibroDB.Models
 {
-    public class CartLine
+    public class Raiting
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
-        public int Quantity { get; set; }
-
+        [Range(0,5, ErrorMessage = "Value of raiting is between (0 - 5)")]
+        public int RaitingBook { get; set; }
         public Guid UserID { get; set; }
-
         public required string ISBN { get; set; }
 
         [ForeignKey("UserID")]

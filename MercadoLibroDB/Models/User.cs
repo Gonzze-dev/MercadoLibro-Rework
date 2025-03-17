@@ -13,6 +13,7 @@ namespace MercadoLibroDB.Models
         public Guid Id { get; set; }
         public required string Name { get; set; } = name;
 
+        [EmailAddress]
         public required string Email { get; set; } = email;
         public bool Admin { get; set; } = false;
 
