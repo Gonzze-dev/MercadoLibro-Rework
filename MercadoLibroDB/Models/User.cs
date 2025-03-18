@@ -17,5 +17,6 @@ namespace MercadoLibroDB.Models
         public required string Email { get; set; } = email;
         public bool Admin { get; set; } = false;
 
+        public virtual ICollection<Book>? Favorite { get; set; } //Favorite
     }
 }
