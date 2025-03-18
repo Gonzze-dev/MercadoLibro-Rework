@@ -3,6 +3,7 @@ using System;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MercadoLibroDB.Migrations
 {
     [DbContext(typeof(MercadoLibroContext))]
-    partial class MercadoLibroContextModelSnapshot : ModelSnapshot
+    [Migration("20250318205637_CreateEntitiesOfSchemeTest1")]
+    partial class CreateEntitiesOfSchemeTest1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,21 +24,6 @@ namespace MercadoLibroDB.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("AuthorBook", b =>
-                {
-                    b.Property<int>("AuthorsId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("BooksISBN")
-                        .HasColumnType("text");
-
-                    b.HasKey("AuthorsId", "BooksISBN");
-
-                    b.HasIndex("BooksISBN");
-
-                    b.ToTable("AuthorBook");
-                });
 
             modelBuilder.Entity("BookGenre", b =>
                 {
@@ -52,21 +40,6 @@ namespace MercadoLibroDB.Migrations
                     b.ToTable("BookGenre");
                 });
 
-            modelBuilder.Entity("BookUser", b =>
-                {
-                    b.Property<string>("FavoriteISBN")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("FavoriteISBN", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Favorite", (string)null);
-                });
-
             modelBuilder.Entity("MercadoLibroDB.Models.Author", b =>
                 {
                     b.Property<int>("Id")
@@ -75,11 +48,16 @@ namespace MercadoLibroDB.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("BookISBN")
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookISBN");
 
                     b.ToTable("Author", (string)null);
                 });
@@ -465,21 +443,6 @@ namespace MercadoLibroDB.Migrations
                     b.ToTable("UserAuth", (string)null);
                 });
 
-            modelBuilder.Entity("AuthorBook", b =>
-                {
-                    b.HasOne("MercadoLibroDB.Models.Author", null)
-                        .WithMany()
-                        .HasForeignKey("AuthorsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MercadoLibroDB.Models.Book", null)
-                        .WithMany()
-                        .HasForeignKey("BooksISBN")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("BookGenre", b =>
                 {
                     b.HasOne("MercadoLibroDB.Models.Book", null)
@@ -495,19 +458,11 @@ namespace MercadoLibroDB.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BookUser", b =>
+            modelBuilder.Entity("MercadoLibroDB.Models.Author", b =>
                 {
                     b.HasOne("MercadoLibroDB.Models.Book", null)
-                        .WithMany()
-                        .HasForeignKey("FavoriteISBN")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MercadoLibroDB.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Authors")
+                        .HasForeignKey("BookISBN");
                 });
 
             modelBuilder.Entity("MercadoLibroDB.Models.Book", b =>
@@ -660,6 +615,11 @@ namespace MercadoLibroDB.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MercadoLibroDB.Models.Book", b =>
+                {
+                    b.Navigation("Authors");
                 });
 
             modelBuilder.Entity("MercadoLibroDB.Models.Cart", b =>

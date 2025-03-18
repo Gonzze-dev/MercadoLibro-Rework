@@ -3,6 +3,7 @@ using System;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MercadoLibroDB.Migrations
 {
     [DbContext(typeof(MercadoLibroContext))]
-    partial class MercadoLibroContextModelSnapshot : ModelSnapshot
+    [Migration("20250318212945_AddRelationFav")]
+    partial class AddRelationFav
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,17 +57,17 @@ namespace MercadoLibroDB.Migrations
 
             modelBuilder.Entity("BookUser", b =>
                 {
-                    b.Property<string>("FavoriteISBN")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("FavoritedById")
                         .HasColumnType("uuid");
 
-                    b.HasKey("FavoriteISBN", "UserId");
+                    b.Property<string>("FavoritesISBN")
+                        .HasColumnType("text");
 
-                    b.HasIndex("UserId");
+                    b.HasKey("FavoritedById", "FavoritesISBN");
 
-                    b.ToTable("Favorite", (string)null);
+                    b.HasIndex("FavoritesISBN");
+
+                    b.ToTable("BookUser");
                 });
 
             modelBuilder.Entity("MercadoLibroDB.Models.Author", b =>
@@ -497,15 +500,15 @@ namespace MercadoLibroDB.Migrations
 
             modelBuilder.Entity("BookUser", b =>
                 {
-                    b.HasOne("MercadoLibroDB.Models.Book", null)
+                    b.HasOne("MercadoLibroDB.Models.User", null)
                         .WithMany()
-                        .HasForeignKey("FavoriteISBN")
+                        .HasForeignKey("FavoritedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MercadoLibroDB.Models.User", null)
+                    b.HasOne("MercadoLibroDB.Models.Book", null)
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("FavoritesISBN")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

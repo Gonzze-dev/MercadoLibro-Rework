@@ -3,6 +3,7 @@ using System;
 using MercadoLibroDB;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MercadoLibroDB.Migrations
 {
     [DbContext(typeof(MercadoLibroContext))]
-    partial class MercadoLibroContextModelSnapshot : ModelSnapshot
+    [Migration("20250318211131_CreateRelationAuthorBook")]
+    partial class CreateRelationAuthorBook
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,21 +53,6 @@ namespace MercadoLibroDB.Migrations
                     b.HasIndex("GenreId");
 
                     b.ToTable("BookGenre");
-                });
-
-            modelBuilder.Entity("BookUser", b =>
-                {
-                    b.Property<string>("FavoriteISBN")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("FavoriteISBN", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Favorite", (string)null);
                 });
 
             modelBuilder.Entity("MercadoLibroDB.Models.Author", b =>
@@ -491,21 +479,6 @@ namespace MercadoLibroDB.Migrations
                     b.HasOne("MercadoLibroDB.Models.Genre", null)
                         .WithMany()
                         .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("BookUser", b =>
-                {
-                    b.HasOne("MercadoLibroDB.Models.Book", null)
-                        .WithMany()
-                        .HasForeignKey("FavoriteISBN")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MercadoLibroDB.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
