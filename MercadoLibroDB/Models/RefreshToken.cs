@@ -7,15 +7,10 @@ namespace MercadoLibroDB.Models
     {
         [Key]
         public Guid Id;
-
         public required string Token { get; set; }
-
         public DateTime CreateAt { get; set; } = DateTime.UtcNow;
-
         public DateTime ExpireAt { get; set; }
-
         public bool Revoke { get; set; } = false;
-
         public Guid UserID { get; set; }
 
         [ForeignKey("UserID")]
