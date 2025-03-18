@@ -5,6 +5,7 @@ namespace MercadoLibroDB.Models
 {
     public class Book
     {
+        [Key]
         public required string ISBN { get; set; }
         public required string ImageUrl{ get; set; }
         public required string Title { get; set; }
@@ -29,5 +30,7 @@ namespace MercadoLibroDB.Models
         public virtual ICollection<Author>? Authors { get; set; }
 
         public virtual ICollection<Genre>? Genre { get; set; }
+
+        public virtual ICollection<User>? User { get; set; } //FavoriteBy
     }
 }
