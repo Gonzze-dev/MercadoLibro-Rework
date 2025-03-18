@@ -1,5 +1,6 @@
 ﻿using MercadoLibroDB.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace MercadoLibroDB
 {
@@ -37,7 +38,13 @@ namespace MercadoLibroDB
 
             mBuilder
                 .Entity<RefreshToken>()
-                .ToTable("RefreshToken");
+            .ToTable("RefreshToken");
+
+            mBuilder.Entity<User>()
+            .HasMany(u => u.Favorite)
+            .WithMany(b => b.User)
+            .UsingEntity(j =>
+                j.ToTable("Favorite"));
 
             mBuilder
                 .Entity<Country>()
@@ -127,6 +134,15 @@ namespace MercadoLibroDB
                 .HasForeignKey(rToken => rToken.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            //Raiting
+            mBuilder
+                .Entity<Raiting>()
+                .HasKey(r => new { r.UserID, r.ISBN });
+
+            //Comment
+            mBuilder
+                .Entity<Comment>()
+                .HasKey(c => new { c.UserID, c.ISBN });
             //Cart
             mBuilder
                 .Entity<Cart>()
@@ -141,7 +157,7 @@ namespace MercadoLibroDB
                 .HasOne(cLine => cLine.User)
                 .WithMany()
                 .HasForeignKey(cLine => cLine.UserID)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);  
         }
     }
 }
