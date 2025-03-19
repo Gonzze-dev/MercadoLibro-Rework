@@ -11,7 +11,7 @@ namespace MercadoLibroDB.Models
 
         public int Quantity { get; set; }
 
-        public Guid UserID { get; set; }
+        public required Guid UserID { get; set; }
 
         public required string ISBN { get; set; }
 
