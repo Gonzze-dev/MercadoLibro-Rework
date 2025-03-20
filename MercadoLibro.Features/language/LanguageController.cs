@@ -1,4 +1,5 @@
 ﻿using MercadoLibroDB.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MercadoLibro.Features.language
@@ -19,6 +20,7 @@ namespace MercadoLibro.Features.language
             return Ok(languages);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPost()]
         [Route("api/language/{name}")]
         public async Task<IActionResult> Add(
@@ -35,7 +37,7 @@ namespace MercadoLibro.Features.language
 
             return Ok(language);
         }
-
+        [Authorize(Policy = "Admin")]
         [HttpPut()]
         [Route("api/language/{name}/{newName}")]
         public async Task<IActionResult> Update(
@@ -54,6 +56,7 @@ namespace MercadoLibro.Features.language
             return Ok(language);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpDelete()]
         [Route("api/language/{name}")]
         public async Task<IActionResult> Delete(
