@@ -22,12 +22,17 @@ namespace MercadoLibro.Features.General.Utils
             SecurityToken token;
             string jwtToken;
 
+            byte[] keyEncoding;
+            SymmetricSecurityKey key;
+            SigningCredentials creds;
+
             string secret = _configuration["Jwt:Key"]
                 ?? throw new Exception("Secret not found");
 
             string role = user.Admin ? "Admin" : "User";
 
-            byte[] key = Encoding.ASCII.GetBytes(secret);
+            keyEncoding = Encoding.ASCII.GetBytes(secret);
+            key = new(keyEncoding);
 
             var claims = new[]
             {
@@ -36,14 +41,13 @@ namespace MercadoLibro.Features.General.Utils
                 new Claim(ClaimTypes.Role, role)
             };
 
+            creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
             SecurityTokenDescriptor tokenDescriptor = new()
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = TokenGlobalConfig.GetLifeToken(),
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature
-                )
+                SigningCredentials = creds
             };
 
             JwtSecurityTokenHandler tokenHandler = new();
