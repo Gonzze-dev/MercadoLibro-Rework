@@ -10,6 +10,10 @@ using MercadoLibro.Features.AuthFeature.Utils;
 using MercadoLibro.Features.General.Utils;
 using MercadoLibro.Features.General.Filters;
 using MercadoLibro.Features.UserFeature.Repository;
+using MercadoLibro.Features.CartFeature.Repositories;
+using MercadoLibro.Features.CartFeature.Service;
+using MercadoLibro.Features.CartFeature.Controlleres;
+using MercadoLibro.Features.language;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,10 +68,21 @@ builder.Services.AddScoped<SocialRedHelper>();
 //RefreshToken
 builder.Services.AddScoped<RefreshTokenRepository>();
 
+//Cart
+builder.Services.AddScoped<CartRepository>();
+builder.Services.AddScoped<CartLineRepository>();
+
+builder.Services.AddScoped<CartService>();
+
+//Language
+builder.Services.AddScoped<LanguageService>();
+builder.Services.AddScoped<LangaugeRepository>();
+
 // Add services to the container.
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(AuthController).Assembly)
-    .AddApplicationPart(typeof(UserController).Assembly);
+    .AddApplicationPart(typeof(UserController).Assembly)
+    .AddApplicationPart(typeof(CartController).Assembly);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
