@@ -1,4 +1,5 @@
 ﻿using MercadoLibroDB.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,7 @@ namespace MercadoLibro.Features.publisher
             return Ok(publishers);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPost("api/publisher/{name}")]
         public async Task<IActionResult> Add(
             string name
@@ -39,6 +41,7 @@ namespace MercadoLibro.Features.publisher
             return Ok(publisher);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpPut("api/publisher/{name}/{newName}")]
         public async Task<IActionResult> Update(
             string name,
@@ -56,6 +59,7 @@ namespace MercadoLibro.Features.publisher
             return Ok(publisher);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpDelete("api/publisher/{name}")]
         public async Task<IActionResult> Delete(
             string name
