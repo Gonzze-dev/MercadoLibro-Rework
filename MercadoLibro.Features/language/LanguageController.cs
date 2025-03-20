@@ -12,8 +12,7 @@ namespace MercadoLibro.Features.language
         readonly LanguageService _service = languageService;
 
         [Authorize(Policy = "Admin")]
-        [HttpGet]
-        [Route("api/language")]
+        [HttpGet("api/language")]
         public async Task<IActionResult> GetAll()
         {
             IEnumerable<Language> languages = await _service.GetAll();
@@ -22,8 +21,7 @@ namespace MercadoLibro.Features.language
         }
 
         [Authorize(Policy = "Admin")]
-        [HttpPost()]
-        [Route("api/language/{name}")]
+        [HttpPost("api/language/{name}")]
         public async Task<IActionResult> Add(
             string name
         )
@@ -40,8 +38,7 @@ namespace MercadoLibro.Features.language
         }
 
         [Authorize(Policy = "Admin")]
-        [HttpPut()]
-        [Route("api/language/{name}/{newName}")]
+        [HttpPut("api/language/{name}/{newName}")]
         public async Task<IActionResult> Update(
             string name,
             string newName
@@ -59,8 +56,7 @@ namespace MercadoLibro.Features.language
         }
 
         [Authorize(Policy = "Admin")]
-        [HttpDelete()]
-        [Route("api/language/{name}")]
+        [HttpDelete("api/language/{name}")]
         public async Task<IActionResult> Delete(
             string name
         )
