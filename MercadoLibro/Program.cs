@@ -14,7 +14,6 @@ using MercadoLibro.Features.CartFeature.Repositories;
 using MercadoLibro.Features.CartFeature.Service;
 using MercadoLibro.Features.CartFeature.Controlleres;
 using MercadoLibro.Features.language;
-using MercadoLibro.Features.publisher;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,10 +77,6 @@ builder.Services.AddScoped<CartService>();
 //Language
 builder.Services.AddScoped<LanguageService>();
 builder.Services.AddScoped<LangaugeRepository>();
-
-//Publisher
-builder.Services.AddScoped<PublisherRepository>();
-builder.Services.AddScoped<PublisherService>();
 
 // Add services to the container.
 builder.Services.AddControllers()
