@@ -17,6 +17,7 @@ using MercadoLibro.Features.language;
 using MercadoLibroDB.Models;
 using MercadoLibro.Features.publisher;
 using MercadoLibro.Features.country;
+using MercadoLibro.Features.author;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,7 +80,7 @@ builder.Services.AddScoped<CartService>();
 
 //Language
 builder.Services.AddScoped<LanguageService>();
-builder.Services.AddScoped<LangaugeRepository>();
+builder.Services.AddScoped<LanguageRepository>();
 
 //Publisher
 builder.Services.AddScoped<PublisherRepository>();
@@ -88,6 +89,10 @@ builder.Services.AddScoped<PublisherService>();
 //Country
 builder.Services.AddScoped<CountryRepository>();
 builder.Services.AddScoped<CountryService>();
+
+//Author
+builder.Services.AddScoped<AuthorRepository>();
+builder.Services.AddScoped<AuthorService>();
 
 // Add services to the container.
 builder.Services.AddControllers()
