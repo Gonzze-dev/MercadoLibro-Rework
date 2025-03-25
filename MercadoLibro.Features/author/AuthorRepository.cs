@@ -1,4 +1,5 @@
-﻿using MercadoLibroDB;
+﻿using MercadoLibro.Features.General.interfaces;
+using MercadoLibroDB;
 using MercadoLibroDB.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,10 +7,9 @@ namespace MercadoLibro.Features.author
 {
     public class AuthorRepository(
         TransactionDB transactionDB    
-    )
+    ) : IEntityBaseRepository<Author, string>
     {
         readonly MercadoLibroContext _context = transactionDB.Context;
-
         
         public async Task<IEnumerable<Author>> GetAll() =>
             await _context.Author.ToListAsync();
