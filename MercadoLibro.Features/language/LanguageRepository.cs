@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MercadoLibro.Features.language
 {
-    public class LangaugeRepository(
+    public class LanguageRepository(
         TransactionDB transactionDB
     )
     {
