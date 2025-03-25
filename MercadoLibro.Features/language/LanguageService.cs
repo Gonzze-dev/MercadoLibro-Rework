@@ -4,12 +4,12 @@ using MercadoLibroDB.Models;
 namespace MercadoLibro.Features.language
 {
     public class LanguageService(
-        LangaugeRepository languageRepository
+        LanguageRepository languageRepository
     )
     {
         public List<ErrorHttp> Errors = [];
 
-        readonly LangaugeRepository _repository = languageRepository;
+        readonly LanguageRepository _repository = languageRepository;
 
         public async Task<IEnumerable<Language>> GetAll()
         {
