@@ -29,7 +29,7 @@ namespace MercadoLibroDB.Models
 
         public virtual ICollection<Author>? Authors { get; set; }
 
-        public virtual ICollection<Genre>? Genre { get; set; }
+        public virtual ICollection<Genre>? Genres { get; set; }
 
         public virtual ICollection<User>? User { get; set; } //FavoriteBy
     }
