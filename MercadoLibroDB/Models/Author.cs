@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace MercadoLibroDB.Models
 {
@@ -10,6 +11,7 @@ namespace MercadoLibroDB.Models
         public int Id { get; set; }
         public required string Name { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<Book>? Books { get; set; }
     }
 }
